@@ -1,0 +1,42 @@
+### Python ###
+# Виртуальное окружение
+.venv/
+venv/
+env/
+
+# Кэш Python
+__pycache__/
+*.py[cod]
+
+# Базы данных
+*.sqlite3
+*.sqlite3-journal
+
+### IDE ###
+.idea/
+.vscode/
+*.iml
+
+### Системные файлы ###
+# Windows
+Thumbs.db
+Desktop.ini
+
+# macOS
+.DS_Store
+__MACOSX/
+
+# Linux
+*~
+.*.sw[po]
+
+### Environment ###
+.env
+*.env
+.env.local
+secrets.yml
+
+### Django ###
+media/
+staticfiles/
+local_settings.py
