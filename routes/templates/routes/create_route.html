@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Создать новый маршрут</h2>
+
+<form method="post">{% csrf_token %}
+  <label>Название:</label>
+  <input type="text" name="name" required><br><br>
+
+  <!-- Контейнер для динамических полей -->
+  <div id="fields"></div>
+
+  <!-- Счётчик общего числа полей -->
+  <input type="hidden" id="total_fields" name="total_fields" value="0">
+
+  <!-- Кнопки добавления разных типов точек -->
+  <button type="button" onclick="addField('text')">Добавить текст</button>
+  <button type="button" onclick="addField('time')">Добавить время</button>
+  <button type="button" onclick="addField('time_range')">Добавить диапазон времени</button>
+  <button type="button" onclick="addField('date')">Добавить дату</button>
+  <button type="button" onclick="addField('date_range')">Добавить диапазон дат</button>
+  <button type="button" onclick="addField('flight')">Добавить рейс</button>
+  <button type="button" onclick="addField('hotel')">Добавить гостиницу</button>
+
+  <br><br>
+  <button type="submit">Сохранить маршрут</button>
+</form>
+
+<script>
+  let idx = 0;
+
+  function addField(type) {
+    const container = document.getElementById('fields');
+    const i = idx++;
+    document.getElementById('total_fields').value = idx;
+
+    let html = `<div class="field-block" data-idx="${i}">`;
+
+    // Общие скрытые поля
+    html += `<input type="hidden" name="type_${i}" value="${type}">`;
+
+    // Типы полей
+    if (type === 'text') {
+      html += `<span>Заметка:</span>
+               <input type="hidden" name="desc_${i}" value="">
+               <input type="text" name="val_${i}" placeholder="Содержание">`;
+    }
+    else if (type === 'time') {
+      html += `<span>Время:</span>
+               Описание: <input type="text" name="desc_${i}" placeholder="Описание">
+               Время: <input type="time" name="val_${i}">`;
+    }
+    else if (type === 'time_range') {
+      html += `<span>Диапазон времени:</span>
+               Описание: <input type="text" name="desc_${i}" placeholder="Описание">
+               Начало: <input type="time" name="val_${i}">
+               Конец: <input type="time" name="val2_${i}">`;
+    }
+    else if (type === 'date') {
+      html += `<span>Дата:</span>
+               Описание: <input type="text" name="desc_${i}" placeholder="Описание">
+               Дата: <input type="date" name="val_${i}">`;
+    }
+    else if (type === 'date_range') {
+      html += `<span>Диапазон дат:</span>
+               Описание: <input type="text" name="desc_${i}" placeholder="Описание">
+               Начало: <input type="date" name="val_${i}">
+               Конец: <input type="date" name="val2_${i}">`;
+    }
+    else if (type === 'flight') {
+      html += `<span>Рейс:</span>
+               Описание: <input type="text" name="desc_${i}" placeholder="Описание">
+               Номер рейса: <input type="text" name="val_${i}">`;
+    }
+    else if (type === 'hotel') {
+      html += `<span>Гостиница:</span>
+               Описание: <input type="text" name="desc_${i}" placeholder="Описание">
+               Название гостиницы: <input type="text" name="val_${i}">`;
+    }
+
+    html += `<button type="button" onclick="removeField(this)">Удалить</button><br><br></div>`;
+    container.insertAdjacentHTML('beforeend', html);
+  }
+
+  function removeField(button) {
+    const block = button.closest('.field-block');
+    block.remove();
+    reindexFields();
+  }
+
+  function reindexFields() {
+    const blocks = Array.from(document.querySelectorAll('.field-block'));
+    idx = blocks.length;
+    document.getElementById('total_fields').value = idx;
+
+    blocks.forEach((block, newIndex) => {
+      block.dataset.idx = newIndex;
+      // для каждого <input> внутри блока
+      Array.from(block.querySelectorAll('input')).forEach(input => {
+        // переименовываем name=..._<oldIndex> → name=..._<newIndex>
+        input.name = input.name.replace(/_(\d+)$/, `_${newIndex}`);
+      });
+    });
+  }
+</script>
+{% endblock %}

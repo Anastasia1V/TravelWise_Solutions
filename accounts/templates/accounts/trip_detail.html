@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% extends 'base_generic.html' %}
+
+{% block content %}
+  <h1>Детали маршрута</h1>
+
+  <p><strong>Название маршрута:</strong> {{ trip.name }}</p>
+  <p><strong>Описание:</strong> {{ trip.description }}</p>
+
+  <h2>Промежуточные точки</h2>
+  <ul>
+    {% for point in trip.points.all %}
+      <li>{{ point.name }} - Время: {{ point.time }} - Место: {{ point.location }}</li>
+    {% endfor %}
+  </ul>
+
+  <a href="{% url 'edit_trip' trip.id %}">Редактировать маршрут</a>
+{% endblock %}
+
+</body>
+</html>

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% extends 'base_generic.html' %}
+
+{% block content %}
+  <h1>Редактировать маршрут</h1>
+  <form method="post">
+    {% csrf_token %}
+    <h2>Основные данные маршрута</h2>
+    {{ trip_form.as_p }}
+
+    <h2>Промежуточные точки</h2>
+    {{ point_formset.management_form }}
+    <div id="trip-points">
+      {% for form in point_formset %}
+        <div class="trip-point">
+          {{ form.as_p }}
+          <button type="button" class="remove-point">Удалить точку</button>
+        </div>
+      {% endfor %}
+    </div>
+
+    <button type="submit">Сохранить изменения</button>
+  </form>
+
+  <button id="add-point">Добавить точку</button>
+
+  <script>
+    document.getElementById('add-point').addEventListener('click', function() {
+      var formset = document.getElementById('trip-points');
+      var newForm = formset.querySelector('.trip-point').cloneNode(true);
+      formset.appendChild(newForm);
+    });
+
+    document.querySelectorAll('.remove-point').forEach(function(button) {
+      button.addEventListener('click', function() {
+        this.closest('.trip-point').remove();
+      });
+    });
+  </script>
+{% endblock %}
+
+</body>
+</html>

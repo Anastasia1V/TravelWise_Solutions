@@ -1,0 +1,10 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><meta charset="UTF-8"><title>TravelWise Solutions</title></head>
+<body>
+    {% if user.is_authenticated %}
+      <p><a href="{% url 'accounts:logout' %}">Выйти</a></p>
+    {% endif %}
+    {% block content %}{% endblock %}
+</body>
+</html>

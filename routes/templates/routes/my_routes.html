@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2>Мои маршруты</h2>
+{% if routes %}
+  <ul>
+  {% for r in routes %}
+    <li>{{ r.name }}
+      [<a href="{% url 'routes:view_route' r.id %}">Просмотреть</a>]
+      [<a href="{% url 'routes:edit_route' r.id %}">Редактировать</a>]
+    </li>
+  {% endfor %}
+  </ul>
+{% else %}
+  <p>Маршруты отсутствуют.</p>
+{% endif %}
+<a href="{% url 'routes:create_route' %}">Создать новый маршрут</a>
+{% endblock %}

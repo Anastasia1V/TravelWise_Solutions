@@ -7,36 +7,83 @@ env/
 # Кэш Python
 __pycache__/
 *.py[cod]
+*$py.class
 
-# Базы данных
+# Пакеты и сборки
+build/
+dist/
+*.egg-info/
+.eggs/
+wheels/
+
+# Логи pip
+pip-log.txt
+pip-delete-this-directory.txt
+
+# Файлы тестов и покрытия
+htmlcov/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+.pytest_cache/
+
+### Базы данных ###
+# SQLite
 *.sqlite3
 *.sqlite3-journal
 
+# Файлы баз данных
+*.db
+*.db-journal
+
 ### IDE ###
+# PyCharm
 .idea/
-.vscode/
 *.iml
+*.iws
+
+# VS Code
+.vscode/
 
 ### Системные файлы ###
 # Windows
 Thumbs.db
 Desktop.ini
+$RECYCLE.BIN/
 
 # macOS
 .DS_Store
 __MACOSX/
 
-# Linux
+# Linux и Unix
 *~
 .*.sw[po]
 
 ### Environment ###
+# Файлы переменных окружения
 .env
 *.env
 .env.local
+.env.*.local
 secrets.yml
+env.json
 
 ### Django ###
+# Игнорировать все файлы миграций, кроме __init__.py
+**/migrations/*.py
+!**/migrations/__init__.py
+# Медиа-файлы загружаемые пользователями
 media/
+# Собранные статические файлы
 staticfiles/
+# Локальные настройки
 local_settings.py
+
+### Логи и отчёты ###
+*.log
+logs/
+
+### Исключения IDE и EditorConfig ###
+*.lock

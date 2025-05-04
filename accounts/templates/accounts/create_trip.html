@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Создание маршрута</h2>
+  <form method="post">
+    {% csrf_token %}
+    {{ trip_form.as_p }}
+
+    <h3>Точки маршрута</h3>
+    {{ point_formset.management_form }}
+
+    {% for form in point_formset %}
+      <div style="margin-bottom: 1em;">
+        {{ form.location.label }}: {{ form.location }}
+        <br>
+        {{ form.arrival_time.label }}: {{ form.arrival_time }}
+        <br>
+        {{ form.departure_time.label }}: {{ form.departure_time }}
+        <br>
+        {{ form.cost.label }}: {{ form.cost }}
+        {{ form.currency }}
+        <br>
+        {% if form.DELETE %}
+          {{ form.DELETE }} <label>Удалить</label>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <button type="submit">Сохранить маршрут</button>
+  </form>
+{% endblock %}

@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+{% block content %}
+  <h2>Просмотр маршрута</h2>
+  <p><strong>Название:</strong> {{ route.name }}</p>
+
+  {% if route.details %}
+    <ul>
+      {% for item in route.details %}
+        <li>
+          {% if item.type == 'text' %}
+            <strong>Заметка:</strong> {{ item.value }}
+          {% elif item.type == 'time' %}
+            <strong>Время:</strong>
+            Описание: {{ item.desc }},
+            Время: {{ item.value }}
+          {% elif item.type == 'time_range' %}
+            <strong>Диапазон времени:</strong>
+            Описание: {{ item.desc }},
+            Начало: {{ item.value.0 }},
+            Конец: {{ item.value.1 }}
+          {% elif item.type == 'date' %}
+            <strong>Дата:</strong>
+            Описание: {{ item.desc }},
+            Дата: {{ item.value }}
+          {% elif item.type == 'date_range' %}
+            <strong>Диапазон дат:</strong>
+            Описание: {{ item.desc }},
+            Начало: {{ item.value.0 }},
+            Конец: {{ item.value.1 }}
+          {% elif item.type == 'flight' %}
+            <strong>Рейс:</strong>
+            Описание: {{ item.desc }},
+            Номер: {{ item.value }}
+          {% elif item.type == 'hotel' %}
+            <strong>Гостиница:</strong>
+            Описание: {{ item.desc }},
+            Название: {{ item.value }}
+          {% endif %}
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <p>Нет деталей.</p>
+  {% endif %}
+
+  <a href="{% url 'routes:edit_route' route.id %}">Редактировать</a> |
+  <a href="{% url 'routes:my_routes' %}">Назад к маршрутам</a>
+{% endblock %}
