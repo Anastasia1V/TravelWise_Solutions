@@ -1,20 +1,97 @@
-    <!-- airports/templates/airports/success.html -->
-    {% extends "base.html" %}
+{% extends "base.html" %}
 
-    {% block content %}
-      <h2>Результат</h2>
-      {% if message %}
-        <p style="color: green;">{{ message }}</p>
-      {% endif %}
+{% block content %}
+<style>
+    .container-success {
+        max-width: 700px;
+        margin: 20px auto;
+        padding: 25px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        font-family: Arial, sans-serif;
+        text-align: center; /* Центрируем основной текст */
+    }
+    .container-success h2 {
+        color: #28a745; /* Зеленый для успеха */
+        margin-bottom: 20px;
+    }
+    .container-success h3 {
+        color: #333;
+        margin-top: 30px;
+        margin-bottom: 15px;
+        border-bottom: 1px solid #eee;
+        padding-bottom: 10px;
+    }
+    .airport-details {
+        text-align: left; /* Детали аэропорта выравниваем по левому краю */
+        max-width: 400px; /* Ограничиваем ширину блока деталей */
+        margin: 0 auto 20px auto; /* Центрируем блок деталей */
+        padding: 15px;
+        background-color: #fff;
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+    }
+    .airport-details p {
+        font-size: 1em;
+        color: #555;
+        margin-bottom: 8px;
+        line-height: 1.6;
+    }
+    .airport-details strong {
+        color: #333;
+        min-width: 80px; /* Для выравнивания названий полей */
+        display: inline-block;
+    }
+    .success-message {
+        font-size: 1.1em;
+        color: #155724; /* Темно-зеленый для текста сообщения */
+        background-color: #d4edda; /* Светло-зеленый фон */
+        border: 1px solid #c3e6cb; /* Зеленая рамка */
+        padding: 15px;
+        border-radius: 5px;
+        margin-bottom: 25px;
+        display: inline-block; /* Чтобы блок был по размеру текста */
+    }
+    .action-links a {
+        display: inline-block;
+        margin: 10px;
+        padding: 10px 20px;
+        background-color: #007bff;
+        color: white;
+        text-decoration: none;
+        border-radius: 5px;
+        transition: background-color 0.2s ease-in-out;
+    }
+    .action-links a:hover {
+        background-color: #0056b3;
+    }
+</style>
 
-      {% if airport %}
-        <h3>Детали найденного аэропорта:</h3>
+<div class="container-success">
+    <h2>Результат Операции</h2>
+
+    {% if message %}
+      <p class="success-message">{{ message }}</p>
+    {% endif %}
+
+    {% if airport %}
+      <h3>Детали найденного аэропорта:</h3>
+      <div class="airport-details">
         <p><strong>ICAO:</strong> {{ airport.icao }}</p>
         <p><strong>Название:</strong> {{ airport.name }}</p>
         <p><strong>Город:</strong> {{ airport.city|default:"N/A" }}</p>
         <p><strong>Страна:</strong> {{ airport.country|default:"N/A" }}</p>
-      {% endif %}
+        {# Можете добавить сюда и другие поля, если они есть в airport_obj #}
+        {# <p><strong>Широта:</strong> {{ airport.latitude|default:"N/A" }}</p> #}
+        {# <p><strong>Долгота:</strong> {{ airport.longitude|default:"N/A" }}</p> #}
+      </div>
+    {% endif %}
 
-      <p><a href="{% url 'airports:find_airport' %}">Искать другой аэропорт</a></p> {# Ссылка на форму поиска #}
-      <p><a href="{% url 'home' %}">На главную</a></p> {# Предполагается, что у вас есть URL 'home' #}
-    {% endblock %}
+    <div class="action-links">
+      <p><a href="{% url 'airports:find_airport' %}">Искать другой аэропорт</a></p>
+      <p><a href="{% url 'home' %}">На главную</a></p>
+    </div>
+</div>
+{% endblock %}

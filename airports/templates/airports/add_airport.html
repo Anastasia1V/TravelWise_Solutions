@@ -1,25 +1,114 @@
-    <!-- airports/templates/airports/add_airport.html -->
-    {% extends "base.html" %} <!-- Или ваш базовый шаблон -->
+{% extends "base.html" %}
 
-    {% block content %}
-      <h2>Найти аэропорт в справочнике</h2>
+{% block content %}
+<style>
+    .container-airport-form {
+        max-width: 600px;
+        margin: 20px auto;
+        padding: 25px;
+        background-color: #f9f9f9;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        font-family: Arial, sans-serif;
+    }
+    .container-airport-form h2 {
+        text-align: center;
+        color: #333;
+        margin-bottom: 20px;
+    }
+    .messages {
+        list-style-type: none;
+        padding: 0;
+        margin-bottom: 20px;
+    }
+    .messages li {
+        padding: 10px 15px;
+        margin-bottom: 10px;
+        border-radius: 4px;
+        font-size: 0.9em;
+    }
+    .messages li.success {
+        background-color: #d4edda;
+        color: #155724;
+        border: 1px solid #c3e6cb;
+    }
+    .messages li.warning {
+        background-color: #fff3cd;
+        color: #856404;
+        border: 1px solid #ffeeba;
+    }
+    .messages li.error {
+        background-color: #f8d7da;
+        color: #721c24;
+        border: 1px solid #f5c6cb;
+    }
+    .airport-form-input p { /* Стилизация абзацев, генерируемых form.as_p */
+        margin-bottom: 15px;
+    }
+    .airport-form-input label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: bold;
+        color: #555;
+    }
+    .airport-form-input input[type="text"],
+    .airport-form-input input[type="password"] { /* Добавил для примера, если форма будет сложнее */
+        width: calc(100% - 22px); /* Учитываем padding и border инпута */
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box; /* Чтобы padding не увеличивал общую ширину */
+    }
+    .airport-form-input .helptext {
+        font-size: 0.8em;
+        color: #777;
+        margin-top: 3px;
+    }
+    .airport-form-input .errorlist {
+        list-style-type: none;
+        padding: 0;
+        color: #dc3545;
+        font-size: 0.85em;
+        margin-top: 5px;
+    }
+    .airport-form-button {
+        display: block;
+        width: 100%;
+        padding: 12px;
+        background-color: #007bff;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        font-size: 1em;
+        cursor: pointer;
+        transition: background-color 0.2s ease-in-out;
+    }
+    .airport-form-button:hover {
+        background-color: #0056b3;
+    }
+</style>
 
-      {% if messages %}
-        <ul class="messages">
-          {% for message in messages %}
-            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-          {% endfor %}
-        </ul>
-      {% endif %}
+<div class="container-airport-form">
+    <h2>Найти аэропорт в справочнике</h2>
 
-      <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">Найти / Проверить</button>
-      </form>
-      
-      {% if message and not form.errors %} {# Сообщение, если аэропорт уже есть (пример из более ранней версии) #}
-          <p style="color: green;">{{ message }}</p>
-      {% endif %}
+    {% if messages %}
+      <ul class="messages">
+        {% for message in messages %}
+          <li class="{{ message.tags }}">{{ message }}</li>
+        {% endfor %}
+      </ul>
+    {% endif %}
 
-    {% endblock %}
+    <form method="post" class="airport-form-input">
+      {% csrf_token %}
+      {{ form.as_p }}
+      <button type="submit" class="airport-form-button">Найти / Проверить</button>
+    </form>
+
+    {# Этот блок был для старой логики, сообщения Django теперь обрабатываются выше #}
+    {# {% if message and not form.errors %}
+        <p style="color: green;">{{ message }}</p>
+    {% endif %} #}
+</div>
+{% endblock %}
