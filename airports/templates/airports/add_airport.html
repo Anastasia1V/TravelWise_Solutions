@@ -1,0 +1,15 @@
+<!-- airports/templates/airports/add_airport.html -->
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Добавить аэропорт</title>
+</head>
+<body>
+    <h1>Добавить аэропорт по ICAO коду</h1>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Добавить</button>
+    </form>
+</body>
+</html>

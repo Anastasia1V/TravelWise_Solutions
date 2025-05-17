@@ -25,5 +25,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('accounts/', include('accounts.urls')),
     path('routes/', include('routes.urls')),
+    path('airports/', include('airports.urls')),
     path('<path:unused>', home_redirect),
+
 ]
