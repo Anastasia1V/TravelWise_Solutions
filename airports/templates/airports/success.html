@@ -1,11 +1,20 @@
-<!-- airports/templates/airports/success.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Успешно</title>
-</head>
-<body>
-    <h1>Аэропорт успешно добавлен!</h1>
-    <a href="{% url 'airports:add_airport' %}">Добавить ещё один</a>
-</body>
-</html>
+    <!-- airports/templates/airports/success.html -->
+    {% extends "base.html" %}
+
+    {% block content %}
+      <h2>Результат</h2>
+      {% if message %}
+        <p style="color: green;">{{ message }}</p>
+      {% endif %}
+
+      {% if airport %}
+        <h3>Детали найденного аэропорта:</h3>
+        <p><strong>ICAO:</strong> {{ airport.icao }}</p>
+        <p><strong>Название:</strong> {{ airport.name }}</p>
+        <p><strong>Город:</strong> {{ airport.city|default:"N/A" }}</p>
+        <p><strong>Страна:</strong> {{ airport.country|default:"N/A" }}</p>
+      {% endif %}
+
+      <p><a href="{% url 'airports:find_airport' %}">Искать другой аэропорт</a></p> {# Ссылка на форму поиска #}
+      <p><a href="{% url 'home' %}">На главную</a></p> {# Предполагается, что у вас есть URL 'home' #}
+    {% endblock %}

@@ -1,15 +1,25 @@
-<!-- airports/templates/airports/add_airport.html -->
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Добавить аэропорт</title>
-</head>
-<body>
-    <h1>Добавить аэропорт по ICAO коду</h1>
-    <form method="post">
+    <!-- airports/templates/airports/add_airport.html -->
+    {% extends "base.html" %} <!-- Или ваш базовый шаблон -->
+
+    {% block content %}
+      <h2>Найти аэропорт в справочнике</h2>
+
+      {% if messages %}
+        <ul class="messages">
+          {% for message in messages %}
+            <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+
+      <form method="post">
         {% csrf_token %}
         {{ form.as_p }}
-        <button type="submit">Добавить</button>
-    </form>
-</body>
-</html>
+        <button type="submit">Найти / Проверить</button>
+      </form>
+      
+      {% if message and not form.errors %} {# Сообщение, если аэропорт уже есть (пример из более ранней версии) #}
+          <p style="color: green;">{{ message }}</p>
+      {% endif %}
+
+    {% endblock %}
