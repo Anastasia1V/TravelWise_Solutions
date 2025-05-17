@@ -1,27 +1,115 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
 {% extends 'base_generic.html' %}
 
-{% block content %}
-  <h1>Детали маршрута</h1>
+{% block extra_css %}
+<style>
+    :root {
+        --primary-yellow: #FFC107;
+        --dark-yellow: #FFA000;
+        --black: #212121;
+        --light-gray: #f5f5f5;
+        --white: #ffffff;
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
 
-  <p><strong>Название маршрута:</strong> {{ trip.name }}</p>
-  <p><strong>Описание:</strong> {{ trip.description }}</p>
+    .trip-detail-container {
+        max-width: 800px;
+        margin: 2rem auto;
+        padding: 2rem;
+        background-color: var(--white);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow);
+    }
 
-  <h2>Промежуточные точки</h2>
-  <ul>
-    {% for point in trip.points.all %}
-      <li>{{ point.name }} - Время: {{ point.time }} - Место: {{ point.location }}</li>
-    {% endfor %}
-  </ul>
+    h1 {
+        color: var(--black);
+        text-align: center;
+        margin-bottom: 1.5rem;
+        font-size: 2rem;
+        border-bottom: 2px solid var(--primary-yellow);
+        padding-bottom: 0.5rem;
+    }
 
-  <a href="{% url 'edit_trip' trip.id %}">Редактировать маршрут</a>
+    h2 {
+        color: var(--black);
+        margin: 2rem 0 1rem 0;
+        font-size: 1.5rem;
+    }
+
+    .trip-info p {
+        margin-bottom: 1rem;
+        line-height: 1.6;
+    }
+
+    .trip-info strong {
+        color: var(--black);
+        font-weight: 600;
+    }
+
+    .points-list {
+        list-style-type: none;
+        padding: 0;
+    }
+
+    .points-list li {
+        background-color: rgba(255, 193, 7, 0.1);
+        padding: 1rem;
+        margin-bottom: 0.5rem;
+        border-left: 3px solid var(--primary-yellow);
+        border-radius: var(--radius-sm);
+    }
+
+    .edit-link {
+        display: inline-block;
+        margin-top: 2rem;
+        padding: 0.75rem 1.5rem;
+        background-color: var(--primary-yellow);
+        color: var(--black);
+        text-decoration: none;
+        border-radius: var(--radius-sm);
+        font-weight: 600;
+        transition: all 0.3s;
+    }
+
+    .edit-link:hover {
+        background-color: var(--dark-yellow);
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 768px) {
+        .trip-detail-container {
+            padding: 1.5rem;
+            margin: 1rem;
+        }
+        
+        h1 {
+            font-size: 1.7rem;
+        }
+    }
+</style>
 {% endblock %}
 
-</body>
-</html>
+{% block content %}
+<div class="trip-detail-container">
+    <h1>Детали маршрута</h1>
+
+    <div class="trip-info">
+        <p><strong>Название маршрута:</strong> {{ trip.name }}</p>
+        <p><strong>Описание:</strong> {{ trip.description }}</p>
+
+        <h2>Промежуточные точки</h2>
+        <ul class="points-list">
+            {% for point in trip.points.all %}
+                <li>
+                    <strong>{{ point.name }}</strong><br>
+                    Время: {{ point.time }}<br>
+                    Место: {{ point.location }}
+                </li>
+            {% endfor %}
+        </ul>
+
+        <a href="{% url 'edit_trip' trip.id %}" class="edit-link">Редактировать маршрут</a>
+    </div>
+</div>
+{% endblock %}

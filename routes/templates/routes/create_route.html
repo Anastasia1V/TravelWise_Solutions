@@ -1,105 +1,271 @@
 {% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    .route-form {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    h2 {
+        color: #212529;
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    form {
+        background-color: white;
+        padding: 2rem;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    label {
+        display: block;
+        margin: 1.5rem 0 0.5rem;
+        font-weight: 500;
+    }
+
+    input[type="text"],
+    input[type="time"],
+    input[type="date"],
+    select {
+        width: 100%;
+        padding: 0.75rem;
+        border: 1px solid #ddd;
+        border-radius: 8px;
+        font-size: 1rem;
+    }
+
+    .field-block {
+        background-color: rgba(255, 193, 7, 0.05);
+        padding: 1.5rem;
+        margin: 1.5rem 0;
+        border-left: 3px solid #ffc107;
+        border-radius: 8px;
+        position: relative;
+    }
+
+    .field-type {
+        display: inline-block;
+        background-color: #ffc107;
+        color: #212529;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .field-row {
+        display: flex;
+        gap: 1rem;
+        margin-bottom: 1rem;
+        align-items: center;
+    }
+
+    .field-row input {
+        flex: 1;
+    }
+
+    .btn-group {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+        margin: 1.5rem 0;
+    }
+
+    .btn {
+        padding: 0.75rem 1.5rem;
+        background-color: #ffc107;
+        color: #212529;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    .btn:hover {
+        background-color: #e0a800;
+    }
+
+    .btn-remove {
+        position: absolute;
+        top: 1rem;
+        right: 1rem;
+        background-color: #dc3545;
+        color: white;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.8rem;
+    }
+
+    .btn-remove:hover {
+        background-color: #c82333;
+    }
+
+    .btn-submit {
+        display: block;
+        width: 100%;
+        max-width: 300px;
+        margin: 2rem auto 0;
+        padding: 1rem;
+        font-size: 1.1rem;
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Создать новый маршрут</h2>
+<div class="route-form">
+    <h2>Создать новый маршрут</h2>
 
-<form method="post">{% csrf_token %}
-  <label>Название:</label>
-  <input type="text" name="name" required><br><br>
+    <form method="post">
+        {% csrf_token %}
 
-  <!-- Контейнер для динамических полей -->
-  <div id="fields"></div>
+        <label>Название маршрута:</label>
+        <input type="text" name="name" required>
 
-  <!-- Счётчик общего числа полей -->
-  <input type="hidden" id="total_fields" name="total_fields" value="0">
+        <div id="fields"></div>
+        <input type="hidden" id="total_fields" name="total_fields" value="0">
 
-  <!-- Кнопки добавления разных типов точек -->
-  <button type="button" onclick="addField('text')">Добавить текст</button>
-  <button type="button" onclick="addField('time')">Добавить время</button>
-  <button type="button" onclick="addField('time_range')">Добавить диапазон времени</button>
-  <button type="button" onclick="addField('date')">Добавить дату</button>
-  <button type="button" onclick="addField('date_range')">Добавить диапазон дат</button>
-  <button type="button" onclick="addField('flight')">Добавить рейс</button>
-  <button type="button" onclick="addField('hotel')">Добавить гостиницу</button>
+        <div class="btn-group">
+            <button type="button" class="btn" onclick="addField('text')">Текст</button>
+            <button type="button" class="btn" onclick="addField('time')">Время</button>
+            <button type="button" class="btn" onclick="addField('time_range')">Диапазон времени</button>
+            <button type="button" class="btn" onclick="addField('date')">Дата</button>
+            <button type="button" class="btn" onclick="addField('date_range')">Диапазон дат</button>
+            <button type="button" class="btn" onclick="addField('flight')">Рейс</button>
+            <button type="button" class="btn" onclick="addField('hotel')">Гостиница</button>
+        </div>
 
-  <br><br>
-  <button type="submit">Сохранить маршрут</button>
-</form>
+        <button type="submit" class="btn btn-submit">Сохранить маршрут</button>
+    </form>
+</div>
 
 <script>
-  let idx = 0;
+    let idx = 0;
+    const fieldTypes = {
+        text: 'Текстовая заметка',
+        time: 'Время',
+        time_range: 'Диапазон времени',
+        date: 'Дата',
+        date_range: 'Диапазон дат',
+        flight: 'Рейс',
+        hotel: 'Гостиница'
+    };
 
-  function addField(type) {
-    const container = document.getElementById('fields');
-    const i = idx++;
-    document.getElementById('total_fields').value = idx;
+    function addField(type) {
+        const container = document.getElementById('fields');
+        const i = idx++;
+        document.getElementById('total_fields').value = idx;
 
-    let html = `<div class="field-block" data-idx="${i}">`;
+        let html = `
+        <div class="field-block" data-idx="${i}">
+            <span class="field-type">${fieldTypes[type]}</span>
+            <button type="button" class="btn-remove" onclick="removeField(this)">×</button>
+            <input type="hidden" name="type_${i}" value="${type}">
+        `;
 
-    // Общие скрытые поля
-    html += `<input type="hidden" name="type_${i}" value="${type}">`;
+        if (type === 'text') {
+            html += `
+                <div class="field-row">
+                    <input type="text" name="val_${i}" placeholder="Текст заметки" required>
+                </div>
+                <input type="hidden" name="desc_${i}" value="Текстовая заметка">
+            `;
+        }
+        else if (type === 'time') {
+            html += `
+                <div class="field-row">
+                    <input type="text" name="desc_${i}" placeholder="Описание" required>
+                </div>
+                <div class="field-row">
+                    <input type="time" name="val_${i}" required>
+                </div>
+            `;
+        }
+        else if (type === 'time_range') {
+            html += `
+                <div class="field-row">
+                    <input type="text" name="desc_${i}" placeholder="Описание" required>
+                </div>
+                <div class="field-row">
+                    <input type="time" name="val_${i}" placeholder="Начало" required>
+                    <span>—</span>
+                    <input type="time" name="val2_${i}" placeholder="Конец" required>
+                </div>
+            `;
+        }
+        else if (type === 'date') {
+            html += `
+                <div class="field-row">
+                    <input type="text" name="desc_${i}" placeholder="Описание" required>
+                </div>
+                <div class="field-row">
+                    <input type="date" name="val_${i}" required>
+                </div>
+            `;
+        }
+        else if (type === 'date_range') {
+            html += `
+                <div class="field-row">
+                    <input type="text" name="desc_${i}" placeholder="Описание" required>
+                </div>
+                <div class="field-row">
+                    <input type="date" name="val_${i}" placeholder="Начало" required>
+                    <span>—</span>
+                    <input type="date" name="val2_${i}" placeholder="Конец" required>
+                </div>
+            `;
+        }
+        else if (type === 'flight') {
+            html += `
+                <div class="field-row">
+                    <input type="text" name="desc_${i}" placeholder="Описание (например, Москва → Санкт-Петербург)" required>
+                </div>
+                <div class="field-row">
+                    <input type="text" name="val_${i}" placeholder="Номер рейса" required>
+                </div>
+                <div class="field-row">
+                    <input type="datetime-local" name="val2_${i}" placeholder="Дата и время вылета" required>
+                </div>
+            `;
+        }
+        else if (type === 'hotel') {
+            html += `
+                <div class="field-row">
+                    <input type="text" name="desc_${i}" placeholder="Город и название отеля" required>
+                </div>
+                <div class="field-row">
+                    <input type="date" name="val_${i}" placeholder="Дата заезда" required>
+                    <span>—</span>
+                    <input type="date" name="val2_${i}" placeholder="Дата выезда" required>
+                </div>
+            `;
+        }
 
-    // Типы полей
-    if (type === 'text') {
-      html += `<span>Заметка:</span>
-               <input type="hidden" name="desc_${i}" value="">
-               <input type="text" name="val_${i}" placeholder="Содержание">`;
+        html += `</div>`;
+        container.insertAdjacentHTML('beforeend', html);
     }
-    else if (type === 'time') {
-      html += `<span>Время:</span>
-               Описание: <input type="text" name="desc_${i}" placeholder="Описание">
-               Время: <input type="time" name="val_${i}">`;
-    }
-    else if (type === 'time_range') {
-      html += `<span>Диапазон времени:</span>
-               Описание: <input type="text" name="desc_${i}" placeholder="Описание">
-               Начало: <input type="time" name="val_${i}">
-               Конец: <input type="time" name="val2_${i}">`;
-    }
-    else if (type === 'date') {
-      html += `<span>Дата:</span>
-               Описание: <input type="text" name="desc_${i}" placeholder="Описание">
-               Дата: <input type="date" name="val_${i}">`;
-    }
-    else if (type === 'date_range') {
-      html += `<span>Диапазон дат:</span>
-               Описание: <input type="text" name="desc_${i}" placeholder="Описание">
-               Начало: <input type="date" name="val_${i}">
-               Конец: <input type="date" name="val2_${i}">`;
-    }
-    else if (type === 'flight') {
-      html += `<span>Рейс:</span>
-               Описание: <input type="text" name="desc_${i}" placeholder="Описание">
-               Номер рейса: <input type="text" name="val_${i}">`;
-    }
-    else if (type === 'hotel') {
-      html += `<span>Гостиница:</span>
-               Описание: <input type="text" name="desc_${i}" placeholder="Описание">
-               Название гостиницы: <input type="text" name="val_${i}">`;
+
+    function removeField(button) {
+        button.closest('.field-block').remove();
+        reindexFields();
     }
 
-    html += `<button type="button" onclick="removeField(this)">Удалить</button><br><br></div>`;
-    container.insertAdjacentHTML('beforeend', html);
-  }
+    function reindexFields() {
+        const blocks = Array.from(document.querySelectorAll('.field-block'));
+        idx = blocks.length;
+        document.getElementById('total_fields').value = idx;
 
-  function removeField(button) {
-    const block = button.closest('.field-block');
-    block.remove();
-    reindexFields();
-  }
-
-  function reindexFields() {
-    const blocks = Array.from(document.querySelectorAll('.field-block'));
-    idx = blocks.length;
-    document.getElementById('total_fields').value = idx;
-
-    blocks.forEach((block, newIndex) => {
-      block.dataset.idx = newIndex;
-      // для каждого <input> внутри блока
-      Array.from(block.querySelectorAll('input')).forEach(input => {
-        // переименовываем name=..._<oldIndex> → name=..._<newIndex>
-        input.name = input.name.replace(/_(\d+)$/, `_${newIndex}`);
-      });
-    });
-  }
+        blocks.forEach((block, newIndex) => {
+            block.dataset.idx = newIndex;
+            block.querySelectorAll('input').forEach(input => {
+                input.name = input.name.replace(/_(\d+)$/, `_${newIndex}`);
+            });
+        });
+    }
 </script>
 {% endblock %}

@@ -1,9 +1,106 @@
 {% extends 'base.html' %}
 {% block content %}
-<h2>Регистрация</h2>
-<form method="post">{% csrf_token %}
-  {{ form.as_p }}
-  <button>Зарегистрироваться</button>
-</form>
-<a href="{% url 'accounts:login' %}">Вход</a>
+<style>
+    .register-container {
+        max-width: 500px;
+        margin: 0 auto;
+        padding: 30px;
+    }
+
+    h2 {
+        color: #212529;
+        text-align: center;
+        margin-bottom: 25px;
+        font-weight: 600;
+    }
+
+    form {
+        background-color: white;
+        padding: 30px;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    form p {
+        margin-bottom: 20px;
+    }
+
+    form label {
+        display: block;
+        margin-bottom: 8px;
+        color: #212529;
+        font-weight: 500;
+    }
+
+    form input {
+        width: 100%;
+        padding: 12px 15px;
+        border: 1px solid #ced4da;
+        border-radius: 8px;
+        font-size: 16px;
+        transition: all 0.3s;
+    }
+
+    form input:focus {
+        border-color: #ffc107;
+        box-shadow: 0 0 0 0.25rem rgba(255, 193, 7, 0.25);
+        outline: none;
+    }
+
+    button {
+        width: 100%;
+        padding: 12px;
+        background-color: #ffc107;
+        color: #212529;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: all 0.3s;
+    }
+
+    button:hover {
+        background-color: #e0a800;
+    }
+
+    a {
+        display: block;
+        text-align: center;
+        margin-top: 20px;
+        color: #ffc107;
+        font-weight: 500;
+        text-decoration: none;
+        transition: all 0.3s;
+    }
+
+    a:hover {
+        color: #e0a800;
+        text-decoration: underline;
+    }
+
+    .errorlist {
+        color: #dc3545;
+        margin-top: 5px;
+        padding-left: 0;
+        list-style: none;
+        font-size: 14px;
+    }
+
+    .helptext {
+        font-size: 13px;
+        color: #6c757d;
+        display: block;
+        margin-top: 5px;
+    }
+</style>
+
+<div class="register-container">
+    <h2>Регистрация</h2>
+    <form method="post">{% csrf_token %}
+      {{ form.as_p }}
+      <button>Зарегистрироваться</button>
+    </form>
+    <a href="{% url 'accounts:login' %}">Вход</a>
+</div>
 {% endblock %}

@@ -1,30 +1,126 @@
 {% extends "base.html" %}
 {% block content %}
-  <h2>Создание маршрута</h2>
-  <form method="post">
-    {% csrf_token %}
-    {{ trip_form.as_p }}
+<style>
 
-    <h3>Точки маршрута</h3>
-    {{ point_formset.management_form }}
+    .route-form {
+        max-width: 800px;
+        margin: 2em auto;
+        padding: 2em;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
 
-    {% for form in point_formset %}
-      <div style="margin-bottom: 1em;">
-        {{ form.location.label }}: {{ form.location }}
-        <br>
-        {{ form.arrival_time.label }}: {{ form.arrival_time }}
-        <br>
-        {{ form.departure_time.label }}: {{ form.departure_time }}
-        <br>
-        {{ form.cost.label }}: {{ form.cost }}
-        {{ form.currency }}
-        <br>
-        {% if form.DELETE %}
-          {{ form.DELETE }} <label>Удалить</label>
-        {% endif %}
-      </div>
-    {% endfor %}
+    .route-form h2 {
+        color: #212529;
+        text-align: center;
+        margin-bottom: 1.5em;
+        font-size: 2em;
+    }
 
-    <button type="submit">Сохранить маршрут</button>
-  </form>
+    .trip-form p {
+        margin-bottom: 1.5em;
+    }
+
+    .trip-form label {
+        display: block;
+        margin-bottom: 0.5em;
+        font-weight: 500;
+    }
+
+    .point-formset {
+        margin-top: 2em;
+    }
+
+    .point-form {
+        background: #f8f9fa;
+        padding: 1.5em;
+        margin-bottom: 1.5em;
+        border-radius: 10px;
+        border-left: 4px solid #ffc107;
+    }
+
+    .point-form div {
+        margin-bottom: 1em;
+    }
+
+    .point-form label {
+        display: inline-block;
+        min-width: 120px;
+        font-weight: 500;
+    }
+
+    .delete-checkbox {
+        margin-top: 1em;
+        display: flex;
+        align-items: center;
+    }
+
+    .delete-checkbox label {
+        margin-left: 0.5em;
+        font-weight: normal;
+    }
+
+    .submit-btn {
+        display: block;
+        width: 100%;
+        max-width: 300px;
+        margin: 2em auto 0;
+        padding: 1em;
+        background: #ffc107;
+        color: #212529;
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .submit-btn:hover {
+        background: #e0a800;
+    }
+</style>
+
+<div class="route-form">
+    <h2>Создание маршрута</h2>
+    <form method="post" class="trip-form">
+        {% csrf_token %}
+        {{ trip_form.as_p }}
+
+        <div class="point-formset">
+            <h3>Точки маршрута</h3>
+            {{ point_formset.management_form }}
+
+            {% for form in point_formset %}
+                <div class="point-form">
+                    <div>
+                        <label>{{ form.location.label }}:</label>
+                        {{ form.location }}
+                    </div>
+                    <div>
+                        <label>{{ form.arrival_time.label }}:</label>
+                        {{ form.arrival_time }}
+                    </div>
+                    <div>
+                        <label>{{ form.departure_time.label }}:</label>
+                        {{ form.departure_time }}
+                    </div>
+                    <div>
+                        <label>{{ form.cost.label }}:</label>
+                        {{ form.cost }}
+                        {{ form.currency }}
+                    </div>
+                    {% if form.DELETE %}
+                        <div class="delete-checkbox">
+                            {{ form.DELETE }}
+                            <label for="{{ form.DELETE.id_for_label }}">Удалить</label>
+                        </div>
+                    {% endif %}
+                </div>
+            {% endfor %}
+        </div>
+
+        <button type="submit" class="submit-btn">Сохранить маршрут</button>
+    </form>
+</div>
 {% endblock %}

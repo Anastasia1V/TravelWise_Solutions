@@ -1,10 +1,202 @@
 <!DOCTYPE html>
-<html lang="en">
-<head><meta charset="UTF-8"><title>TravelWise Solutions</title></head>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TravelWise | {% block title %}{% endblock %}</title>
+    <style>
+        :root {
+            --yellow: #ffc107;
+            --yellow-dark: #e0a800;
+            --black: #212529;
+            --gray-light: #f8f9fa;
+            --white: #ffffff;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: var(--gray-light);
+            color: var(--black);
+            line-height: 1.6;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+
+        /* Навигация */
+        .navbar {
+            background-color: var(--black);
+            padding: 1rem 0;
+            border-bottom-left-radius: var(--radius-md);
+            border-bottom-right-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .navbar-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .navbar-brand {
+            color: var(--yellow);
+            font-size: 1.5rem;
+            font-weight: 700;
+            text-decoration: none;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .navbar-brand::before {
+            content: "";
+            display: inline-block;
+            width: 30px;
+            height: 30px;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='%23ffc107'%3E%3Cpath d='M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z'/%3E%3C/svg%3E");
+            background-size: contain;
+            background-repeat: no-repeat;
+        }
+
+        .navbar-nav {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: var(--yellow);
+            text-decoration: none;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: var(--radius-sm);
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .nav-link:hover {
+            background-color: rgba(255, 193, 7, 0.15);
+        }
+
+        /* Основной контент */
+        main {
+            flex: 1;
+            padding: 2rem 0;
+        }
+
+        /* Футер */
+        .footer {
+            background-color: var(--black);
+            color: var(--white);
+            padding: 1.5rem 0;
+            text-align: center;
+            border-top-left-radius: var(--radius-md);
+            border-top-right-radius: var(--radius-md);
+            margin-top: auto;
+        }
+
+        /* Утилиты */
+        .btn {
+            display: inline-block;
+            padding: 0.75rem 1.5rem;
+            background-color: var(--yellow);
+            color: var(--black);
+            border: none;
+            border-radius: var(--radius-sm);
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            transition: all 0.2s ease;
+            text-align: center;
+        }
+
+        .btn:hover {
+            background-color: var(--yellow-dark);
+            transform: translateY(-1px);
+        }
+
+        .btn-block {
+            display: block;
+            width: 100%;
+        }
+
+        /* Карточки */
+        .card {
+            background: var(--white);
+            border-radius: var(--radius-md);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Адаптивность */
+        @media (max-width: 768px) {
+            .navbar-container {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .navbar-nav {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 0.5rem;
+                padding-top: 1rem;
+            }
+
+            .nav-link {
+                display: block;
+                width: 100%;
+                padding: 0.75rem;
+            }
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
 <body>
-    {% if user.is_authenticated %}
-      <p><a href="{% url 'accounts:logout' %}">Выйти</a></p>
-    {% endif %}
-    {% block content %}{% endblock %}
+    <nav class="navbar">
+        <div class="container navbar-container">
+            <a href="{% url 'home' %}" class="navbar-brand">TravelWise</a>
+            <div class="navbar-nav">
+                {% if user.is_authenticated %}
+                    <a href="{% url 'accounts:logout' %}" class="nav-link">Выйти</a>
+                {% else %}
+                    <a href="{% url 'accounts:login' %}" class="nav-link">Войти</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; {% now "Y" %} TravelWise Solutions</p>
+        </div>
+    </footer>
+
+    {% block extra_js %}{% endblock %}
 </body>
 </html>
