@@ -1,48 +1,161 @@
 {% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    .route-view {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    h2 {
+        color: #212529;
+        text-align: center;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #ffc107;
+        padding-bottom: 0.5rem;
+    }
+
+    .route-name {
+        font-size: 1.2rem;
+        margin-bottom: 2rem;
+        padding: 1rem;
+        background-color: rgba(255, 193, 7, 0.1);
+        border-left: 4px solid #ffc107;
+        border-radius: 4px;
+    }
+
+    .details-list {
+        list-style: none;
+        padding: 0;
+        margin: 2rem 0;
+    }
+
+    .detail-item {
+        background-color: white;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        position: relative;
+    }
+
+    .detail-type {
+        display: inline-block;
+        background-color: #ffc107;
+        color: #212529;
+        padding: 0.3rem 0.8rem;
+        border-radius: 20px;
+        font-size: 0.9rem;
+        font-weight: 600;
+        margin-bottom: 1rem;
+    }
+
+    .detail-content {
+        line-height: 1.6;
+    }
+
+    .no-details {
+        text-align: center;
+        color: #6c757d;
+        margin: 2rem 0;
+    }
+
+    .action-links {
+        display: flex;
+        justify-content: center;
+        gap: 1.5rem;
+        margin-top: 2rem;
+    }
+
+    .action-link {
+        color: #ffc107;
+        text-decoration: none;
+        font-weight: 500;
+        padding: 0.5rem 1rem;
+        border-radius: 6px;
+        transition: all 0.3s;
+    }
+
+    .action-link:hover {
+        background-color: rgba(255, 193, 7, 0.1);
+        text-decoration: underline;
+    }
+
+    @media (max-width: 600px) {
+        .action-links {
+            flex-direction: column;
+            gap: 1rem;
+            align-items: center;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-  <h2>Просмотр маршрута</h2>
-  <p><strong>Название:</strong> {{ route.name }}</p>
+<div class="route-view">
+    <h2>Просмотр маршрута</h2>
 
-  {% if route.details %}
-    <ul>
-      {% for item in route.details %}
-        <li>
-          {% if item.type == 'text' %}
-            <strong>Заметка:</strong> {{ item.value }}
-          {% elif item.type == 'time' %}
-            <strong>Время:</strong>
-            Описание: {{ item.desc }},
-            Время: {{ item.value }}
-          {% elif item.type == 'time_range' %}
-            <strong>Диапазон времени:</strong>
-            Описание: {{ item.desc }},
-            Начало: {{ item.value.0 }},
-            Конец: {{ item.value.1 }}
-          {% elif item.type == 'date' %}
-            <strong>Дата:</strong>
-            Описание: {{ item.desc }},
-            Дата: {{ item.value }}
-          {% elif item.type == 'date_range' %}
-            <strong>Диапазон дат:</strong>
-            Описание: {{ item.desc }},
-            Начало: {{ item.value.0 }},
-            Конец: {{ item.value.1 }}
-          {% elif item.type == 'flight' %}
-            <strong>Рейс:</strong>
-            Описание: {{ item.desc }},
-            Номер: {{ item.value }}
-          {% elif item.type == 'hotel' %}
-            <strong>Гостиница:</strong>
-            Описание: {{ item.desc }},
-            Название: {{ item.value }}
-          {% endif %}
+    <div class="route-name">
+        <strong>Название:</strong> {{ route.name }}
+    </div>
+
+    {% if route.details %}
+    <ul class="details-list">
+        {% for item in route.details %}
+        <li class="detail-item">
+            <span class="detail-type">
+                {% if item.type == 'text' %}Заметка
+                {% elif item.type == 'time' %}Время
+                {% elif item.type == 'time_range' %}Диапазон времени
+                {% elif item.type == 'date' %}Дата
+                {% elif item.type == 'date_range' %}Диапазон дат
+                {% elif item.type == 'flight' %}Рейс
+                {% elif item.type == 'hotel' %}Гостиница
+                {% endif %}
+            </span>
+
+            <div class="detail-content">
+                {% if item.type == 'text' %}
+                    {{ item.value }}
+                {% elif item.type == 'time' %}
+                    <div><strong>Описание:</strong> {{ item.desc }}</div>
+                    <div><strong>Время:</strong> {{ item.value }}</div>
+                {% elif item.type == 'time_range' %}
+                    <div><strong>Описание:</strong> {{ item.desc }}</div>
+                    <div><strong>Начало:</strong> {{ item.value.0 }}</div>
+                    <div><strong>Конец:</strong> {{ item.value.1 }}</div>
+                {% elif item.type == 'date' %}
+                    <div><strong>Описание:</strong> {{ item.desc }}</div>
+                    <div><strong>Дата:</strong> {{ item.value }}</div>
+                {% elif item.type == 'date_range' %}
+                    <div><strong>Описание:</strong> {{ item.desc }}</div>
+                    <div><strong>Начало:</strong> {{ item.value.0 }}</div>
+                    <div><strong>Конец:</strong> {{ item.value.1 }}</div>
+                {% elif item.type == 'flight' %}
+                    <div><strong>Описание:</strong> {{ item.desc }}</div>
+                    <div><strong>Номер рейса:</strong> {{ item.value }}</div>
+                    {% if item.time %}
+                    <div><strong>Время вылета:</strong> {{ item.time }}</div>
+                    {% endif %}
+                {% elif item.type == 'hotel' %}
+                    <div><strong>Описание:</strong> {{ item.desc }}</div>
+                    <div><strong>Название:</strong> {{ item.value }}</div>
+                    {% if item.dates %}
+                    <div><strong>Даты:</strong> {{ item.dates.0 }} — {{ item.dates.1 }}</div>
+                    {% endif %}
+                {% endif %}
+            </div>
         </li>
-      {% endfor %}
+        {% endfor %}
     </ul>
-  {% else %}
-    <p>Нет деталей.</p>
-  {% endif %}
+    {% else %}
+    <p class="no-details">Нет деталей маршрута</p>
+    {% endif %}
 
-  <a href="{% url 'routes:edit_route' route.id %}">Редактировать</a> |
-  <a href="{% url 'routes:my_routes' %}">Назад к маршрутам</a>
+    <div class="action-links">
+        <a href="{% url 'routes:edit_route' route.id %}" class="action-link">Редактировать маршрут</a>
+        <a href="{% url 'routes:my_routes' %}" class="action-link">Назад к списку маршрутов</a>
+    </div>
+</div>
 {% endblock %}

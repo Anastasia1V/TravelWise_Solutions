@@ -1,17 +1,122 @@
 {% extends 'base.html' %}
+
+{% block extra_css %}
+<style>
+    .routes-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 2rem;
+    }
+
+    h2 {
+        color: #212529;
+        text-align: center;
+        margin-bottom: 2rem;
+        border-bottom: 2px solid #ffc107;
+        padding-bottom: 0.5rem;
+    }
+
+    .routes-list {
+        list-style: none;
+        padding: 0;
+        margin: 2rem 0;
+    }
+
+    .route-item {
+        background-color: white;
+        padding: 1.5rem;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .route-name {
+        font-weight: 600;
+        font-size: 1.1rem;
+        color: #212529;
+    }
+
+    .route-actions {
+        display: flex;
+        gap: 1rem;
+    }
+
+    .route-link {
+        color: #ffc107;
+        text-decoration: none;
+        font-weight: 500;
+        transition: all 0.3s;
+        padding: 0.3rem 0.6rem;
+        border-radius: 4px;
+    }
+
+    .route-link:hover {
+        background-color: rgba(255, 193, 7, 0.1);
+    }
+
+    .no-routes {
+        text-align: center;
+        color: #6c757d;
+        margin: 2rem 0;
+    }
+
+    .create-btn {
+        display: inline-block;
+        background-color: #ffc107;
+        color: #212529;
+        padding: 0.75rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        transition: all 0.3s;
+        margin-top: 1rem;
+    }
+
+    .create-btn:hover {
+        background-color: #e0a800;
+        transform: translateY(-2px);
+    }
+
+    @media (max-width: 600px) {
+        .route-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 1rem;
+        }
+
+        .route-actions {
+            width: 100%;
+            justify-content: flex-end;
+        }
+    }
+</style>
+{% endblock %}
+
 {% block content %}
-<h2>Мои маршруты</h2>
-{% if routes %}
-  <ul>
-  {% for r in routes %}
-    <li>{{ r.name }}
-      [<a href="{% url 'routes:view_route' r.id %}">Просмотреть</a>]
-      [<a href="{% url 'routes:edit_route' r.id %}">Редактировать</a>]
-    </li>
-  {% endfor %}
-  </ul>
-{% else %}
-  <p>Маршруты отсутствуют.</p>
-{% endif %}
-<a href="{% url 'routes:create_route' %}">Создать новый маршрут</a>
+<div class="routes-container">
+    <h2>Мои маршруты</h2>
+
+    {% if routes %}
+    <ul class="routes-list">
+        {% for r in routes %}
+        <li class="route-item">
+            <span class="route-name">{{ r.name }}</span>
+            <div class="route-actions">
+                <a href="{% url 'routes:view_route' r.id %}" class="route-link">Просмотреть</a>
+                <a href="{% url 'routes:edit_route' r.id %}" class="route-link">Редактировать</a>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+    {% else %}
+    <p class="no-routes">Маршруты отсутствуют.</p>
+    {% endif %}
+
+    <div style="text-align: center;">
+        <a href="{% url 'routes:create_route' %}" class="create-btn">Создать новый маршрут</a>
+    </div>
+</div>
 {% endblock %}
