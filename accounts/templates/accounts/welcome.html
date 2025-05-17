@@ -2,60 +2,160 @@
 
 {% block extra_css %}
 <style>
+    @import url('https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&family=Playfair+Display:wght@700&display=swap');
+
     :root {
-        --primary-yellow: #FFC107;
-        --dark-yellow: #FFA000;
-        --black: #212121;
-        --white: #ffffff;
-        --light-gray: #f5f5f5;
-        --radius-sm: 8px;
-        --radius-md: 12px;
-        --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        /* ВАШИ ЦВЕТА */
+        --main-yellow: #ffc107;
+        --main-yellow-dark: #e0a800;
+        --main-black: #212529;
+
+        /* Дополнительные цвета для фона и текста, можно адаптировать */
+        --text-on-yellow: var(--main-black); /* Черный текст на желтом */
+        --text-on-black: var(--main-yellow); /* Желтый текст на черном (или белый) */
+        --text-on-black-alt: #f8f9fa;   /* Альтернативный белый текст на черном */
+        --color-medium-text: #495057; /* Средний серый для текста */
+        --color-light-background: #f8f9fa; /* Очень светлый фон страницы */
+        --color-card-background: #ffffff;
+        --color-border: #dee2e6;
+
+        --font-main: 'Roboto', sans-serif;
+        --font-display: 'Playfair Display', serif;
+
+        --radius-md: 8px;
+        --shadow-subtle: 0 2px 8px rgba(0, 0, 0, 0.07);
+        --shadow-strong: 0 6px 16px rgba(0, 0, 0, 0.1);
     }
+
+    /* Стили PyCharm body ... (если нужно, но лучше, если base.html это делает) */
+    /*
+    body {
+        font-family: var(--font-main);
+        background-color: var(--color-light-background);
+        color: var(--main-black);
+        margin: 0;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        min-height: 100vh;
+    }
+    */
 
     .welcome-container {
+        background-color: var(--color-card-background);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-strong);
+        padding: 2.5rem 2rem;
+        width: 90%;
+        max-width: 650px;
+        margin: 3rem auto;
+        text-align: center;
+        animation: fadeInScale 0.8s ease-out;
+        border-top: 5px solid var(--main-yellow); /* Акцентная полоса сверху */
+    }
+
+    @keyframes fadeInScale {
+        from { opacity: 0; transform: translateY(15px) scale(0.98); }
+        to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .welcome-container h1 {
+        font-family: var(--font-display);
+        font-size: 3rem;
+        font-weight: 700;
+        color: var(--main-black); /* Используем ваш черный */
+        margin-bottom: 0.75rem;
+        line-height: 1.1;
+    }
+
+    .welcome-container .username {
+        color: var(--main-yellow-dark); /* Имя пользователя - вашим темно-желтым */
+    }
+
+    .welcome-container p.subtitle {
+        font-family: var(--font-main);
+        font-size: 1.15rem;
+        font-weight: 300;
+        color: var(--color-medium-text);
+        margin-bottom: 2.5rem;
+        line-height: 1.7;
+    }
+
+    .actions-group {
         display: flex;
         flex-direction: column;
-        align-items: center;
-        justify-content: center;
-        min-height: 70vh;
-        text-align: center;
-        padding: 2rem;
+        gap: 1.25rem;
+        width: 100%;
+        max-width: 320px;
+        margin-left: auto;
+        margin-right: auto;
     }
 
-    h1 {
-        color: var(--black);
-        font-size: 2.5rem;
-        margin-bottom: 2rem;
-        font-weight: 600;
-    }
-
-    .routes-link {
+    .action-btn {
+        font-family: var(--font-main);
         display: inline-block;
-        padding: 1rem 2rem;
-        background-color: var(--primary-yellow);
-        color: var(--black);
+        padding: 0.85rem 1.5rem;
+        border: 2px solid transparent;
+        border-radius: var(--radius-md);
+        font-size: 1.05rem;
+        font-weight: 500;
         text-decoration: none;
-        border-radius: var(--radius-sm);
-        font-size: 1.1rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-        box-shadow: var(--shadow);
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.25s ease-in-out;
+        box-shadow: var(--shadow-subtle);
+        letter-spacing: 0.3px;
+    }
+     .action-btn:focus-visible { /* Для доступности при навигации с клавиатуры */
+        outline: 2px solid var(--main-yellow-dark);
+        outline-offset: 3px;
     }
 
-    .routes-link:hover {
-        background-color: var(--dark-yellow);
-        transform: translateY(-3px);
-        box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+
+    .btn-routes { /* Для кнопки "Мои маршруты" */
+        background-color: var(--main-yellow);
+        color: var(--text-on-yellow); /* Черный текст */
+        border-color: var(--main-yellow);
     }
 
+    .btn-routes:hover {
+        background-color: var(--main-yellow-dark);
+        border-color: var(--main-yellow-dark);
+        color: var(--text-on-yellow);
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-strong);
+    }
+
+    .btn-airports { /* Для кнопки "Справочник аэропортов" */
+        background-color: var(--main-black);
+        color: var(--main-yellow); /* Желтый текст на черном */
+        border-color: var(--main-black);
+    }
+
+    .btn-airports:hover {
+        background-color: #3a3f44; /* Чуть светлее ваш черный для ховера */
+        border-color: #3a3f44;
+        color: var(--main-yellow-dark); /* Темно-желтый для ховера на тексте */
+        transform: translateY(-2px);
+        box-shadow: var(--shadow-strong);
+    }
+
+    /* Адаптивность */
     @media (max-width: 768px) {
-        h1 {
-            font-size: 2rem;
+        .welcome-container {
+            padding: 2rem 1rem;
+            margin: 2rem 1rem;
+            border-top-width: 4px; /* Чуть тоньше полоска */
         }
-
-        .routes-link {
-            padding: 0.8rem 1.5rem;
+        .welcome-container h1 {
+            font-size: 2.4rem;
+        }
+        .welcome-container p.subtitle {
+            font-size: 1rem;
+        }
+        .action-btn {
+            padding: 0.8rem 1.2rem;
+            font-size: 1rem;
         }
     }
 </style>
@@ -63,7 +163,12 @@
 
 {% block content %}
 <div class="welcome-container">
-    <h1>Добро пожаловать!</h1>
-    <a href="{% url 'routes:my_routes' %}" class="routes-link">Мои маршруты</a>
+    <h1>Снова здравствуйте, <span class="username">{{ user.username|default:"Чемпион" }}</span>!</h1>
+    <p class="subtitle">Ваши планы ждут своего часа. Давайте создадим что-то невероятное!</p>
+
+    <div class="actions-group">
+        <a href="{% url 'routes:my_routes' %}" class="action-btn btn-routes">Мои маршруты</a>
+        <a href="{% url 'airports:find_airport' %}" class="action-btn btn-airports">Справочник аэропортов</a>
+    </div>
 </div>
 {% endblock %}
