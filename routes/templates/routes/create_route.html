@@ -280,10 +280,22 @@
 
     <form method="post">
         {% csrf_token %}
+        <p>
+            <label for="id_name_route">Название маршрута:</label> {# Используем for с id инпута #}
+            <input type="text" name="name" id="id_name_route" value="{{ current_name|default:'' }}" required>
+        </p>
 
         <p>
-            <label for="id_name">Название маршрута:</label>
-            <input type="text" name="name" id="id_name" value="{{ current_name|default:'' }}" required>
+            <label for="id_calculation_currency">Валюта для итогового расчета (опционально):</label>
+            <select name="calculation_currency" id="id_calculation_currency">
+                <option value="">-- Не выбрана (будет использована базовая {{ default_calculation_currency|default:'USD' }}) --</option>
+                {% for currency in currencies %}
+                    <option value="{{ currency.code }}"
+                            {% if current_calculation_currency == currency.code or not current_calculation_currency and default_calculation_currency == currency.code and not route %}selected{% endif %}>
+                        {{ currency.name }} ({{ currency.code }})
+                    </option>
+                {% endfor %}
+            </select>
         </p>
 
         <div id="fields-container"></div> {# Изменил ID для большей ясности #}
@@ -330,6 +342,12 @@
 </div>
 
 <script>
+    const availableCurrencies = [
+        {% for currency in currencies %}
+            { code: "{{ currency.code }}", name: "{{ currency.name|escapejs }} ({{ currency.code }})", symbol: "{{ currency.symbol|default:''|escapejs }}" },
+        {% endfor %}
+    ];
+
     let idx = 0; // Глобальный счетчик для индекса полей
     const fieldTypes = {
         text: 'Текстовая заметка',
@@ -430,7 +448,27 @@
                 </div>
             `;
         }
+        html += `
+            <div class="field-row" style="margin-top: 1rem; border-top: 1px dashed #ddd; padding-top: 1rem;">
+                <div style="flex: 2;"> {# Поле суммы пошире #}
+                    <label for="cost_amount_${i}">Стоимость (опционально):</label>
+                    <input type="number" step="0.01" name="cost_amount_${i}" id="cost_amount_${i}" placeholder="Сумма">
+                </div>
+                <div style="flex: 1;"> {# Поле валюты поуже #}
+                    <label for="cost_currency_code_${i}">Валюта:</label>
+                    <select name="cost_currency_code_${i}" id="cost_currency_code_${i}">
+                        <option value="">-- Валюта --</option>`;
 
+        availableCurrencies.forEach(function(currency) {
+            html += `<option value="${currency.code}">${currency.name}</option>`;
+        });
+
+        html += `
+                    </select>
+                </div>
+            </div>
+        `;
+        // --- КОНЕЦ ДОБАВЛЕНИЯ HTML ДЛЯ СТОИМОСТИ И ВАЛЮТЫ ---
         html += `</div>`; // Закрываем field-block
         container.insertAdjacentHTML('beforeend', html);
     }

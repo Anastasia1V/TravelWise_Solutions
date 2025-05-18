@@ -26,6 +26,7 @@ urlpatterns = [
     path('accounts/', include('accounts.urls')),
     path('routes/', include('routes.urls')),
     path('airports/', include('airports.urls')),
+    path('core/', include('core.urls')),
     path('<path:unused>', home_redirect),
 
 ]

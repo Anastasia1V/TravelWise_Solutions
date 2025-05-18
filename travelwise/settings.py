@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'accounts',
     'routes',
     'airports',
+    'core'
 ]
 
 MIDDLEWARE = [
@@ -113,3 +114,5 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'accounts.CustomUser'
 
 LOGIN_URL = '/accounts/login/'
+
+BASE_CURRENCY_FOR_RATES = 'USD'
