@@ -144,6 +144,15 @@
                     {% if item.dates %}
                     <div><strong>Даты:</strong> {{ item.dates.0 }} — {{ item.dates.1 }}</div>
                     {% endif %}
+                {% elif item.type == 'flight_manual_icao' %} {# Убедитесь, что 'flight_manual_icao' - это то, что вы сохраняете как тип #}
+                    {% if item.desc %}
+                        <div><strong>Описание:</strong> {{ item.desc }}</div>
+                    {% endif %}
+                    <div><strong>ICAO вылета:</strong> {{ item.dep_icao_manual|default:"N/A" }}</div>
+                    <div><strong>ICAO прилета:</strong> {{ item.arr_icao_manual|default:"N/A" }}</div>
+                    {% if item.flight_datetime %}
+                        <div><strong>Дата и время вылета:</strong> {{ item.flight_datetime }}</div>
+                    {% endif %}
                 {% endif %}
             </div>
         </li>
