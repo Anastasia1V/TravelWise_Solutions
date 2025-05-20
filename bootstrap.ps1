@@ -1,5 +1,5 @@
 # bootstrap.ps1
-# Project bootstrap script: create venv if needed, install deps, run migrations, load airports, run server.
+# Full project bootstrap: setup venv, install requirements, migrate DB, load airports, runserver, open browser
 
 param(
     [string]$csvPath = ".\airports\data\airports_data.csv"
@@ -13,7 +13,7 @@ if (!(Test-Path "$venvPath")) {
     $venvPath = ".\venv"
 }
 
-# 2) Create virtual environment if missing
+# 2) Create venv if missing
 if (!(Test-Path "$venvPath")) {
     Write-Host "Virtual environment not found. Creating..." -NoNewline
     python -m venv $venvPath
@@ -24,7 +24,7 @@ if (!(Test-Path "$venvPath")) {
     Write-Host " OK"
 }
 
-# 3) Activate virtual environment
+# 3) Activate venv
 $activateScript = "$venvPath\Scripts\Activate.ps1"
 if (Test-Path $activateScript) {
     Write-Host "Activating virtual environment..." -NoNewline
@@ -35,7 +35,7 @@ if (Test-Path $activateScript) {
     exit 1
 }
 
-# 4) Install dependencies
+# 4) Install requirements
 Write-Host "Installing dependencies..." -NoNewline
 pip install -r requirements.txt
 if ($LASTEXITCODE -ne 0) {
@@ -44,7 +44,7 @@ if ($LASTEXITCODE -ne 0) {
 }
 Write-Host " OK"
 
-# 5) Run migrations
+# 5) Migrations
 Write-Host "Running makemigrations..." -NoNewline
 python manage.py makemigrations
 if ($LASTEXITCODE -ne 0) {
@@ -74,8 +74,9 @@ if (Test-Path $csvPath) {
     Write-Host "CSV file not found: $csvPath" -ForegroundColor Yellow
 }
 
-# 7) Run development server
-Write-Host "Starting Django development server at http://127.0.0.1:8000/" -ForegroundColor Cyan
-Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd `"$PWD`"; & $venvPath\Scripts\Activate.ps1; python manage.py runserver"
+# 7) Run server and open browser
+Write-Host "Starting server and opening browser..." -ForegroundColor Cyan
+Start-Process powershell -ArgumentList "-NoExit", "-Command", "cd `"$PWD`"; & '$venvPath\Scripts\Activate.ps1'; python manage.py runserver"
+Start-Process "http://127.0.0.1:8000/"
 
-Write-Host "=== Bootstrap finished successfully ===" -ForegroundColor Green
+Write-Host "=== Bootstrap completed successfully ===" -ForegroundColor Green
