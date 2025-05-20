@@ -2,8 +2,7 @@
 
 {% block extra_css %}
 <style>
-    /* Стили могут быть такими же, как в create_route.html */
-    /* Скопируйте сюда блок <style> из вашего create_route.html */
+    /* Все ваши существующие стили остаются без изменений */
     .route-form {
         max-width: 800px;
         margin: 0 auto;
@@ -60,8 +59,21 @@
             <input type="text" name="name" id="id_name" value="{{ route.name|default:'' }}" required>
         </p>
 
+        <!-- Добавляем выбор валюты для расчета, как на странице создания -->
+        <p>
+            <label for="id_calculation_currency">Валюта для итогового расчета (опционально):</label>
+            <select name="calculation_currency" id="id_calculation_currency">
+                <option value="">-- Не выбрана (будет использована базовая {{ default_calculation_currency|default:'USD' }}) --</option>
+                {% for currency in currencies %}
+                    <option value="{{ currency.code }}"
+                            {% if route.calculation_currency == currency.code or not route.calculation_currency and default_calculation_currency == currency.code %}selected{% endif %}>
+                        {{ currency.name }} ({{ currency.code }})
+                    </option>
+                {% endfor %}
+            </select>
+        </p>
+
         <div id="fields-container">
-            {# --- ЦИКЛ ДЛЯ ОТОБРАЖЕНИЯ СУЩЕСТВУЮЩИХ ДЕТАЛЕЙ --- #}
             {% if route.details %}
                 {% for item in route.details %}
                 <div class="field-block" id="field_block_{{ forloop.counter0 }}" data-idx="{{ forloop.counter0 }}">
@@ -121,10 +133,10 @@
                         </div>
 
                     {% elif item.type == 'flight_manual_icao' %}
-                        <p><label for="dep_icao_manual_{{ forloop.counter0 }}">ICAO вылета:</label>
+                        <p><label for="dep_icao_manual_{{ forloop.counter0 }}">ICAО вылета:</label>
                         <input type="text" name="dep_icao_manual_{{ forloop.counter0 }}" id="dep_icao_manual_{{ forloop.counter0 }}" value="{{ item.dep_icao_manual|default:'' }}" placeholder="Напр. SVO" maxlength="8" style="text-transform:uppercase;" required></p>
 
-                        <p><label for="arr_icao_manual_{{ forloop.counter0 }}">ICAO прилета:</label>
+                        <p><label for="arr_icao_manual_{{ forloop.counter0 }}">ICAО прилета:</label>
                         <input type="text" name="arr_icao_manual_{{ forloop.counter0 }}" id="arr_icao_manual_{{ forloop.counter0 }}" value="{{ item.arr_icao_manual|default:'' }}" placeholder="Напр. LHR" maxlength="8" style="text-transform:uppercase;" required></p>
 
                         <p><label for="flight_datetime_{{ forloop.counter0 }}">Дата и время вылета (опционально):</label>
@@ -145,13 +157,32 @@
                             </div>
                         </div>
                     {% endif %}
+
+                    <!-- Добавляем блок для стоимости в каждой детали -->
+                    <div class="field-row" style="margin-top: 1rem; border-top: 1px dashed #ddd; padding-top: 1rem;">
+                        <div style="flex: 2;">
+                            <label for="cost_amount_{{ forloop.counter0 }}">Стоимость (опционально):</label>
+                            <input type="number" step="0.01" name="cost_amount_{{ forloop.counter0 }}" id="cost_amount_{{ forloop.counter0 }}"
+                                   value="{{ item.cost_amount|default:'' }}" placeholder="Сумма">
+                        </div>
+                        <div style="flex: 1;">
+                            <label for="cost_currency_code_{{ forloop.counter0 }}">Валюта:</label>
+                            <select name="cost_currency_code_{{ forloop.counter0 }}" id="cost_currency_code_{{ forloop.counter0 }}">
+                                <option value="">-- Валюта --</option>
+                                {% for currency in currencies %}
+                                    <option value="{{ currency.code }}"
+                                            {% if item.cost_currency_code == currency.code %}selected{% endif %}>
+                                        {{ currency.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
                 </div>
                 {% endfor %}
             {% endif %}
         </div>
-        {# Это значение будет установлено JavaScript при инициализации #}
         <input type="hidden" id="total_fields" name="total_fields" value="{{ route.details|length|default:0 }}">
-
 
         <div class="airport-reference-section">
             <h4>Справочник аэропортов</h4>
@@ -176,6 +207,13 @@
     // Инициализируем idx количеством существующих деталей
     let idx = {{ route.details|length|default:0 }};
 
+    // Добавляем список доступных валют для JavaScript
+    const availableCurrencies = [
+        {% for currency in currencies %}
+            { code: "{{ currency.code }}", name: "{{ currency.name|escapejs }} ({{ currency.code }})", symbol: "{{ currency.symbol|default:''|escapejs }}" },
+        {% endfor %}
+    ];
+
     const fieldTypes = {
         text: 'Текстовая заметка',
         time: 'Время события',
@@ -186,11 +224,9 @@
         hotel: 'Гостиница'
     };
 
-    // Функция addField остается такой же, как в create_route.html,
-    // так как она добавляет НОВЫЕ поля с текущим значением idx
     function addField(type) {
         const container = document.getElementById('fields-container');
-        const i = idx++; // Используем текущий idx и затем инкрементируем
+        const i = idx++;
         document.getElementById('total_fields').value = idx;
 
         let html = `
@@ -214,9 +250,9 @@
             html += `<div class="field-row"><div><label for="val1_${i}">Начальная дата:</label><input type="date" name="val1_${i}" id="val1_${i}" required></div><span>—</span><div><label for="val2_${i}">Конечная дата:</label><input type="date" name="val2_${i}" id="val2_${i}" required></div></div>`;
         } else if (type === 'flight_manual_icao') {
             html += `
-                <p><label for="dep_icao_manual_${i}">ICAO вылета:</label>
+                <p><label for="dep_icao_manual_${i}">ICAО вылета:</label>
                 <input type="text" name="dep_icao_manual_${i}" id="dep_icao_manual_${i}" placeholder="Напр. SVO" maxlength="8" style="text-transform:uppercase;" required></p>
-                <p><label for="arr_icao_manual_${i}">ICAO прилета:</label>
+                <p><label for="arr_icao_manual_${i}">ICAО прилета:</label>
                 <input type="text" name="arr_icao_manual_${i}" id="arr_icao_manual_${i}" placeholder="Напр. LHR" maxlength="8" style="text-transform:uppercase;" required></p>
                 <p><label for="flight_datetime_${i}">Дата и время вылета (опционально):</label>
                 <input type="datetime-local" name="flight_datetime_${i}" id="flight_datetime_${i}"></p>
@@ -232,11 +268,32 @@
                 </div>
             `;
         }
-        html += `</div>`;
+
+        // Добавляем блок для стоимости в новую деталь
+        html += `
+            <div class="field-row" style="margin-top: 1rem; border-top: 1px dashed #ddd; padding-top: 1rem;">
+                <div style="flex: 2;">
+                    <label for="cost_amount_${i}">Стоимость (опционально):</label>
+                    <input type="number" step="0.01" name="cost_amount_${i}" id="cost_amount_${i}" placeholder="Сумма">
+                </div>
+                <div style="flex: 1;">
+                    <label for="cost_currency_code_${i}">Валюта:</label>
+                    <select name="cost_currency_code_${i}" id="cost_currency_code_${i}">
+                        <option value="">-- Валюта --</option>`;
+
+        availableCurrencies.forEach(function(currency) {
+            html += `<option value="${currency.code}">${currency.name}</option>`;
+        });
+
+        html += `
+                    </select>
+                </div>
+            </div>
+        </div>`;
+
         container.insertAdjacentHTML('beforeend', html);
     }
 
-    // removeField и reindexFields остаются такими же, как в create_route.html
     function removeField(button) {
         button.closest('.field-block').remove();
         reindexFields();
@@ -246,8 +303,7 @@
         const container = document.getElementById('fields-container');
         const blocks = Array.from(container.querySelectorAll('.field-block'));
 
-        let currentGlobalIdx = 0; // Используем локальную переменную для переиндексации
-
+        idx = 0;
         blocks.forEach((block, newIndex) => {
             block.dataset.idx = newIndex;
             block.id = `field_block_${newIndex}`;
@@ -265,20 +321,9 @@
                     label.htmlFor = label.htmlFor.replace(/_(\d+)$/, `_${newIndex}`);
                 }
             });
-            currentGlobalIdx = newIndex + 1; // Обновляем для следующего добавления
+            idx++;
         });
-        idx = currentGlobalIdx; // Устанавливаем глобальный idx равным следующему доступному индексу
         document.getElementById('total_fields').value = blocks.length;
     }
-
-    // Вызовем reindexFields один раз при загрузке страницы, чтобы убедиться,
-    // что data-idx у существующих блоков соответствует их начальному индексу,
-    // если это важно для какой-то другой логики (хотя в данном JS это не используется).
-    // Это также установит idx и total_fields в правильное начальное значение.
-    // Однако, Django цикл forloop.counter0 уже должен дать правильные начальные индексы.
-    // Поэтому явный вызов reindexFields при загрузке может быть излишним, если
-    // Django-цикл и инициализация `let idx = {{ route.details|length|default:0 }};` работают корректно.
-    // Оставим idx инициализированным через Django. total_fields также инициализируется через Django.
-    // reindexFields будет вызываться только после удаления поля.
 </script>
 {% endblock %}

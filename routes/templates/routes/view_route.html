@@ -6,37 +6,50 @@
         max-width: 800px;
         margin: 0 auto;
         padding: 2rem;
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     }
 
     h2 {
         color: #212529;
         text-align: center;
         margin-bottom: 2rem;
-        border-bottom: 2px solid #ffc107;
         padding-bottom: 0.5rem;
+        border-bottom: 3px solid #ffc107;
     }
 
-    .route-name {
-        font-size: 1.2rem;
-        margin-bottom: 2rem;
-        padding: 1rem;
+    /* Стили для заголовка маршрута (как в форме редактирования) */
+    .route-header {
         background-color: rgba(255, 193, 7, 0.1);
+        padding: 1.5rem;
+        border-radius: 8px;
+        margin-bottom: 2rem;
         border-left: 4px solid #ffc107;
-        border-radius: 4px;
     }
 
+    .route-header-item {
+        margin-bottom: 0.8rem;
+    }
+
+    .route-header-item strong {
+        display: inline-block;
+        min-width: 200px;
+        color: #495057;
+    }
+
+    /* Стили для деталей (аналогичные field-block из формы редактирования) */
     .details-list {
         list-style: none;
         padding: 0;
-        margin: 2rem 0;
     }
 
     .detail-item {
-        background-color: white;
+        background-color: rgba(255, 193, 7, 0.05);
         padding: 1.5rem;
-        margin-bottom: 1rem;
+        margin-bottom: 1.5rem;
         border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        border-left: 3px solid #ffc107;
         position: relative;
     }
 
@@ -51,42 +64,38 @@
         margin-bottom: 1rem;
     }
 
-    .detail-content {
-        line-height: 1.6;
+    .detail-content div {
+        margin-bottom: 0.5rem;
     }
 
-    .no-details {
-        text-align: center;
-        color: #6c757d;
-        margin: 2rem 0;
+    /* Стили для стоимости (как в форме редактирования) */
+    .cost-section {
+        margin-top: 1rem;
+        padding-top: 1rem;
+        border-top: 1px dashed #ddd;
     }
 
-    .action-links {
+    .cost-row {
         display: flex;
-        justify-content: center;
-        gap: 1.5rem;
-        margin-top: 2rem;
+        align-items: center;
+        gap: 1rem;
     }
 
-    .action-link {
-        color: #ffc107;
-        text-decoration: none;
-        font-weight: 500;
-        padding: 0.5rem 1rem;
-        border-radius: 6px;
-        transition: all 0.3s;
+    .cost-amount {
+        font-weight: 600;
     }
 
-    .action-link:hover {
-        background-color: rgba(255, 193, 7, 0.1);
-        text-decoration: underline;
+    .cost-currency {
+        background-color: #f8f9fa;
+        padding: 0.3rem 0.8rem;
+        border-radius: 4px;
     }
 
-    @media (max-width: 600px) {
-        .action-links {
-            flex-direction: column;
-            gap: 1rem;
-            align-items: center;
+    /* Адаптивность */
+    @media (max-width: 768px) {
+        .route-header-item strong {
+            display: block;
+            margin-bottom: 0.3rem;
         }
     }
 </style>
@@ -96,8 +105,22 @@
 <div class="route-view">
     <h2>Просмотр маршрута</h2>
 
-    <div class="route-name">
-        <strong>Название:</strong> {{ route.name }}
+    <div class="route-header">
+        <div class="route-header-item">
+            <strong>Название:</strong> {{ route.name }}
+        </div>
+        <div class="route-header-item">
+            <strong>Валюта расчета:</strong>
+            {% if route.calculation_currency %}
+                {% for currency in currencies %}
+                    {% if currency.code == route.calculation_currency %}
+                        {{ currency.name }} ({{ currency.code }})
+                    {% endif %}
+                {% endfor %}
+            {% else %}
+                {{ default_calculation_currency|default:"USD" }}
+            {% endif %}
+        </div>
     </div>
 
     {% if route.details %}
@@ -105,66 +128,73 @@
         {% for item in route.details %}
         <li class="detail-item">
             <span class="detail-type">
-                {% if item.type == 'text' %}Заметка
+                {% if item.type == 'text' %}Текст
                 {% elif item.type == 'time' %}Время
                 {% elif item.type == 'time_range' %}Диапазон времени
                 {% elif item.type == 'date' %}Дата
                 {% elif item.type == 'date_range' %}Диапазон дат
-                {% elif item.type == 'flight' %}Рейс
+                {% elif item.type == 'flight_manual_icao' %}Рейс
                 {% elif item.type == 'hotel' %}Гостиница
                 {% endif %}
             </span>
 
             <div class="detail-content">
+                {% if item.desc %}
+                <div><strong>Описание:</strong> {{ item.desc }}</div>
+                {% endif %}
+
                 {% if item.type == 'text' %}
-                    {{ item.value }}
+                    <div>{{ item.value }}</div>
+
                 {% elif item.type == 'time' %}
-                    <div><strong>Описание:</strong> {{ item.desc }}</div>
                     <div><strong>Время:</strong> {{ item.value }}</div>
+
                 {% elif item.type == 'time_range' %}
-                    <div><strong>Описание:</strong> {{ item.desc }}</div>
-                    <div><strong>Начало:</strong> {{ item.value.0 }}</div>
-                    <div><strong>Конец:</strong> {{ item.value.1 }}</div>
+                    <div><strong>Период:</strong> {{ item.value.0 }} — {{ item.value.1 }}</div>
+
                 {% elif item.type == 'date' %}
-                    <div><strong>Описание:</strong> {{ item.desc }}</div>
                     <div><strong>Дата:</strong> {{ item.value }}</div>
+
                 {% elif item.type == 'date_range' %}
-                    <div><strong>Описание:</strong> {{ item.desc }}</div>
-                    <div><strong>Начало:</strong> {{ item.value.0 }}</div>
-                    <div><strong>Конец:</strong> {{ item.value.1 }}</div>
-                {% elif item.type == 'flight' %}
-                    <div><strong>Описание:</strong> {{ item.desc }}</div>
-                    <div><strong>Номер рейса:</strong> {{ item.value }}</div>
-                    {% if item.time %}
-                    <div><strong>Время вылета:</strong> {{ item.time }}</div>
-                    {% endif %}
-                {% elif item.type == 'hotel' %}
-                    <div><strong>Описание:</strong> {{ item.desc }}</div>
-                    <div><strong>Название:</strong> {{ item.value }}</div>
-                    {% if item.dates %}
-                    <div><strong>Даты:</strong> {{ item.dates.0 }} — {{ item.dates.1 }}</div>
-                    {% endif %}
-                {% elif item.type == 'flight_manual_icao' %} {# Убедитесь, что 'flight_manual_icao' - это то, что вы сохраняете как тип #}
-                    {% if item.desc %}
-                        <div><strong>Описание:</strong> {{ item.desc }}</div>
-                    {% endif %}
-                    <div><strong>ICAO вылета:</strong> {{ item.dep_icao_manual|default:"N/A" }}</div>
-                    <div><strong>ICAO прилета:</strong> {{ item.arr_icao_manual|default:"N/A" }}</div>
+                    <div><strong>Период:</strong> {{ item.value.0 }} — {{ item.value.1 }}</div>
+
+                {% elif item.type == 'flight_manual_icao' %}
+                    <div><strong>Вылет из:</strong> {{ item.dep_icao_manual|default:"—" }}</div>
+                    <div><strong>Прилет в:</strong> {{ item.arr_icao_manual|default:"—" }}</div>
                     {% if item.flight_datetime %}
-                        <div><strong>Дата и время вылета:</strong> {{ item.flight_datetime }}</div>
+                    <div><strong>Дата вылета:</strong> {{ item.flight_datetime }}</div>
                     {% endif %}
+
+                {% elif item.type == 'hotel' %}
+                    <div><strong>Название:</strong> {{ item.value }}</div>
+                    {% if item.dates_hotel %}
+                    <div><strong>Даты:</strong> {{ item.dates_hotel.0 }} — {{ item.dates_hotel.1 }}</div>
+                    {% endif %}
+                {% endif %}
+
+                {% if item.cost_amount %}
+                <div class="cost-section">
+                    <div class="cost-row">
+                        <strong>Стоимость:</strong>
+                        <span class="cost-amount">{{ item.cost_amount }}</span>
+                        {% if item.cost_currency_code %}
+                        <span class="cost-currency">
+                            {% for currency in currencies %}
+                                {% if currency.code == item.cost_currency_code %}
+                                    {{ currency.symbol|default:currency.code }}
+                                {% endif %}
+                            {% endfor %}
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
                 {% endif %}
             </div>
         </li>
         {% endfor %}
     </ul>
     {% else %}
-    <p class="no-details">Нет деталей маршрута</p>
+    <div style="text-align: center; color: #6c757d;">Нет деталей маршрута</div>
     {% endif %}
-
-    <div class="action-links">
-        <a href="{% url 'routes:edit_route' route.id %}" class="action-link">Редактировать маршрут</a>
-        <a href="{% url 'routes:my_routes' %}" class="action-link">Назад к списку маршрутов</a>
-    </div>
 </div>
 {% endblock %}
