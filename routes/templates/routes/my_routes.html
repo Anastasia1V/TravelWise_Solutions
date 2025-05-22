@@ -2,121 +2,283 @@
 
 {% block extra_css %}
 <style>
-    .routes-container {
-        max-width: 800px;
-        margin: 0 auto;
-        padding: 2rem;
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap');
+
+    :root {
+        /* Ваши фирменные цвета */
+        --main-yellow: #ffc107;
+        --main-yellow-dark: #e0a800;
+        --main-black: #212529;
+
+        /* Дополнительные системные цвета */
+        --text-primary: var(--main-black);
+        --text-secondary: #495057; /* Для менее важного текста */
+        --text-on-yellow: var(--main-black);
+        --background-page: #f4f7f9; /* Очень светлый, почти незаметный серый */
+        --background-card: #ffffff;
+        --border-color: #e9ecef; /* Светлая рамка */
+        --border-color-strong: #dee2e6;
+
+        --font-body: 'Inter', sans-serif; /* Современный шрифт без засечек */
+        --font-heading: 'Playfair Display', serif; /* Элегантный шрифт для заголовков */
+
+        --radius-sm: 6px;
+        --radius-md: 10px;
+        --shadow-soft: 0 4px 15px rgba(0, 0, 0, 0.06);
+        --shadow-medium: 0 8px 25px rgba(0, 0, 0, 0.08);
+        --shadow-strong: 0 12px 35px rgba(0, 0, 0, 0.1);
     }
 
-    h2 {
-        color: #212529;
-        text-align: center;
-        margin-bottom: 2rem;
-        border-bottom: 2px solid #ffc107;
-        padding-bottom: 0.5rem;
+    /* Если body стили не заданы в base.html адекватно */
+    /*
+    body {
+        font-family: var(--font-body);
+        background-color: var(--background-page);
+        color: var(--text-primary);
+        margin: 0;
+        padding-top: 2rem;
     }
+    */
+
+    .routes-container {
+        max-width: 900px; /* Немного шире для большего "воздуха" */
+        margin: 2rem auto; /* Отступы сверху/снизу и центрирование */
+        padding: 2rem 2.5rem; /* Увеличенные внутренние отступы */
+        background-color: transparent; /* Контейнер теперь прозрачный, фон страницы основной */
+    }
+
+    .routes-container h2 {
+        font-family: var(--font-heading);
+        color: var(--text-primary);
+        text-align: center;
+        font-size: 2.75rem; /* Крупнее и элегантнее */
+        margin-bottom: 2.5rem; /* Больше отступ снизу */
+        font-weight: 700;
+        /* border-bottom: 3px solid var(--main-yellow); */ /* Можно вернуть, если нравится */
+        /* padding-bottom: 0.75rem; */
+        position: relative;
+    }
+    /* Декоративная линия под заголовком */
+    .routes-container h2::after {
+        content: '';
+        display: block;
+        width: 80px; /* Ширина линии */
+        height: 4px;  /* Толщина линии */
+        background-color: var(--main-yellow);
+        margin: 0.75rem auto 0; /* Отступ сверху и центрирование */
+        border-radius: 2px;
+    }
+
 
     .routes-list {
         list-style: none;
         padding: 0;
-        margin: 2rem 0;
+        margin: 2.5rem 0; /* Больше отступы */
     }
 
     .route-item {
-        background-color: white;
-        padding: 1.5rem;
-        margin-bottom: 1rem;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        background-color: var(--background-card);
+        padding: 1.75rem 2rem; /* Увеличенные внутренние отступы */
+        margin-bottom: 1.5rem; /* Увеличенный отступ между элементами */
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-medium);
         display: flex;
         justify-content: space-between;
         align-items: center;
+        border-left: 6px solid transparent; /* Для ховер-эффекта */
+        transition: all 0.3s ease-in-out, border-left-color 0.4s ease; /* Плавные переходы */
+    }
+
+    .route-item:hover {
+        transform: translateY(-4px) scale(1.01); /* Более заметный эффект */
+        box-shadow: var(--shadow-strong);
+        border-left-color: var(--main-yellow); /* Акцентная полоска при наведении */
+    }
+
+    .route-info { /* Контейнер для имени и возможной доп. информации */
+        flex-grow: 1;
     }
 
     .route-name {
-        font-weight: 600;
-        font-size: 1.1rem;
-        color: #212529;
+        font-family: var(--font-body);
+        font-weight: 600; /* Средне-жирный */
+        font-size: 1.25rem; /* Чуть крупнее */
+        color: var(--text-primary);
+        margin: 0; /* Убираем лишние отступы у p, если это span */
+        line-height: 1.4;
     }
+     /* Если хотите добавить дату создания или количество деталей под именем */
+    .route-meta {
+        font-size: 0.85rem;
+        color: var(--text-secondary);
+        margin-top: 0.25rem;
+    }
+
 
     .route-actions {
         display: flex;
-        gap: 1rem;
+        gap: 0.75rem; /* Чуть меньше gap между кнопками */
+        flex-shrink: 0; /* Чтобы кнопки не сжимались */
+        margin-left: 1.5rem; /* Отступ от информации о маршруте */
     }
 
-    .route-link {
-        color: #ffc107;
+    .route-action-btn { /* Общий класс для кнопок действий */
+        font-family: var(--font-body);
         text-decoration: none;
-        font-weight: 500;
-        transition: all 0.3s;
-        padding: 0.3rem 0.6rem;
-        border-radius: 4px;
+        font-weight: 500; /* Средняя жирность */
+        padding: 0.6rem 1.1rem; /* Немного другие паддинги */
+        border-radius: var(--radius-sm);
+        transition: all 0.25s ease;
+        font-size: 0.9rem; /* Немного меньше текст */
+        border: 1px solid transparent; /* Для визуального отклика */
+        display: inline-flex; /* Для иконки (если будете добавлять) */
+        align-items: center;
+    }
+    /* Иконка внутри кнопки (пример) */
+    .route-action-btn svg {
+        width: 16px;
+        height: 16px;
+        margin-right: 0.4rem;
+        fill: currentColor;
     }
 
-    .route-link:hover {
-        background-color: rgba(255, 193, 7, 0.1);
+    .btn-view {
+        background-color: var(--main-yellow);
+        color: var(--text-on-yellow);
+        border-color: var(--main-yellow);
     }
+    .btn-view:hover {
+        background-color: var(--main-yellow-dark);
+        border-color: var(--main-yellow-dark);
+        box-shadow: 0 2px 8px rgba(255,193,7,0.3); /* Тень цвета кнопки */
+    }
+
+    .btn-edit {
+        background-color: transparent;
+        color: var(--text-primary);
+        border-color: var(--border-color-strong);
+    }
+    .btn-edit:hover {
+        background-color: var(--main-black); /* Ваш --main-black */
+        color: var(--main-yellow); /* Ваш --main-yellow */
+        border-color: var(--main-black);
+        box-shadow: 0 2px 8px rgba(33,37,41,0.3); /* Тень цвета кнопки */
+    }
+
 
     .no-routes {
         text-align: center;
-        color: #6c757d;
-        margin: 2rem 0;
+        color: var(--text-secondary);
+        margin: 3rem 0; /* Больше отступ */
+        font-size: 1.1rem; /* Крупнее текст */
+        padding: 2rem;
+        background-color: var(--background-card);
+        border-radius: var(--radius-md);
+        box-shadow: var(--shadow-soft);
+    }
+    .no-routes p { margin: 0; }
+
+
+    .create-btn-container { /* Контейнер для центрирования кнопки "Создать" */
+        text-align: center;
+        margin-top: 3rem; /* Больше отступ */
+        padding-bottom: 2rem; /* Отступ снизу страницы */
     }
 
     .create-btn {
-        display: inline-block;
-        background-color: #ffc107;
-        color: #212529;
-        padding: 0.75rem 1.5rem;
-        border-radius: 8px;
+        font-family: var(--font-body);
+        display: inline-flex;
+        align-items: center;
+        background-image: linear-gradient(to right, var(--main-yellow) 0%, var(--main-yellow-dark) 70%, var(--main-yellow-dark) 100%);
+        color: var(--text-on-yellow);
+        padding: 0.9rem 2rem; /* Чуть больше паддинги */
+        border-radius: var(--radius-md); /* Более скругленная */
         text-decoration: none;
-        font-weight: 600;
-        transition: all 0.3s;
-        margin-top: 1rem;
+        font-weight: 600; /* Жирнее */
+        font-size: 1.1rem; /* Крупнее */
+        transition: all 0.3s ease;
+        box-shadow: var(--shadow-medium);
+        border: none;
+    }
+    .create-btn svg { /* Иконка для кнопки "Создать" */
+        width: 20px; height: 20px; margin-right: 0.6rem; fill: currentColor;
     }
 
     .create-btn:hover {
-        background-color: #e0a800;
-        transform: translateY(-2px);
+        background-position: right center; /* Эффект сдвига градиента, если он есть */
+        box-shadow: var(--shadow-strong);
+        transform: scale(1.03) translateY(-2px); /* Небольшое увеличение и подъем */
     }
 
-    @media (max-width: 600px) {
+    @media (max-width: 768px) { /* Адаптивность для планшетов */
+        .routes-container { padding: 1.5rem; }
+        .routes-container h2 { font-size: 2.25rem; margin-bottom: 2rem;}
+        .routes-container h2::after { width: 60px; height: 3px; }
+        .route-item { padding: 1.25rem 1.5rem; }
+        .route-name { font-size: 1.1rem; }
+    }
+
+    @media (max-width: 600px) { /* Адаптивность для мобильных */
         .route-item {
             flex-direction: column;
-            align-items: flex-start;
+            align-items: stretch; /* Растягиваем по ширине */
             gap: 1rem;
         }
-
         .route-actions {
             width: 100%;
-            justify-content: flex-end;
+            justify-content: flex-start; /* Кнопки слева */
+            margin-left: 0;
+            gap: 0.5rem;
         }
+        .route-action-btn {
+            flex-grow: 1; /* Кнопки могут занимать доступное место */
+            text-align: center;
+        }
+        .create-btn { padding: 0.8rem 1.5rem; font-size: 1rem; }
+        .routes-container h2 { font-size: 2rem; }
     }
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="routes-container">
-    <h2>Мои маршруты</h2>
+    <h2>Мои Путешествия</h2>
 
     {% if routes %}
     <ul class="routes-list">
         {% for r in routes %}
         <li class="route-item">
-            <span class="route-name">{{ r.name }}</span>
+            <div class="route-info">
+                <p class="route-name">{{ r.name }}</p>
+                {# Можно добавить дату создания или количество деталей, если хотите #}
+                {# <p class="route-meta">Создан: {{ r.created|date:"d M Y" }} | Деталей: {{ r.details|length }}</p> #}
+            </div>
             <div class="route-actions">
-                <a href="{% url 'routes:view_route' r.id %}" class="route-link">Просмотреть</a>
-                <a href="{% url 'routes:edit_route' r.id %}" class="route-link">Редактировать</a>
+                {# Пример добавления SVG иконок (Feather Icons) #}
+                <a href="{% url 'routes:view_route' r.id %}" class="route-action-btn btn-view">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path><circle cx="12" cy="12" r="3"></circle></svg>
+                    Просмотреть
+                </a>
+                <a href="{% url 'routes:edit_route' r.id %}" class="route-action-btn btn-edit">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                    Редактировать
+                </a>
             </div>
         </li>
         {% endfor %}
     </ul>
     {% else %}
-    <p class="no-routes">Маршруты отсутствуют.</p>
+    <div class="no-routes">
+        <p>У вас пока нет запланированных маршрутов.</p>
+        <p>Готовы начать свое следующее приключение?</p>
+    </div>
     {% endif %}
 
-    <div style="text-align: center;">
-        <a href="{% url 'routes:create_route' %}" class="create-btn">Создать новый маршрут</a>
+    <div class="create-btn-container">
+        <a href="{% url 'routes:create_route' %}" class="create-btn">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+            Создать новый маршрут
+        </a>
     </div>
 </div>
 {% endblock %}
